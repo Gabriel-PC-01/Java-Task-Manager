@@ -1,0 +1,23 @@
+@startuml
+
+    class Task{
+
+        title : String
+        date : Date
+        description : Description
+
+
+    }
+
+
+    class TaskFileManager{
+
+        taskFile : Path
+
+        writeTaskTitle(String title)
+        writeTaskDate(Date date)
+        writeTaskDescription(String description);
+
+    }
+
+@enduml
