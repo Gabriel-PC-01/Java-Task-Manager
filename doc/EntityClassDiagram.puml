@@ -1,0 +1,58 @@
+@startuml
+
+
+    class Task{
+
+        Title title
+        TaskDate date
+        Description description
+
+        setTitle(Title) : EntityStatus
+        setDescription(Description) : EntityStatus
+        setDate(Date) : EntityStatus
+
+        getTitle() : String
+
+    }
+
+    class Title{
+
+        String title;
+
+        setTitle(String) : EntityStatus
+
+        getTitle() : String
+
+    }
+
+    class TaskDate{
+
+        Calendar date
+
+        setYear(Integer) : EntityStatus
+        setMonth(Integer) : EntityStatus
+        setDay(Integer) : EntityStatus
+        setHour(Integer) : EntityStatus
+        setMinute(Integer) : EntityStatus
+
+        getDate() : String
+        
+    }
+
+    class Description{
+
+        String description;
+
+        setDescription(String) : EntityStatus
+
+        getDescription() : String
+
+    }
+ 
+    Task *-- Title : has >
+    Task *-- TaskDate : has >
+    Task *-- Description : has >
+
+    note top of Task : It needs Title, TaskDate and Description to be instace
+
+@enduml
