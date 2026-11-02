@@ -1,96 +1,133 @@
 package com.clovis.entity.task;
 
-import java.util.Calendar;
-import java.util.Objects;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import com.clovis.entity.EntityStatus;
+
 
 /**
  * Date
  */
-final public class TaskDate {
+final class TaskDate{
 
-    private final Calendar timetoFinish = Calendar.getInstance();
+    private final  Integer[] timeFields;
+    private final Integer leapDay = 29;
+    private final LocalDateTime currentDate = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
 
 
-    public EntityStatus setYear(final Integer year){
+    public TaskDate(Integer[] timeFields) throws Exception{
 
-        // Calendar works with range from 0 to 11 for months
-        // and for user is 1 to 12, cause this year - 1
-        if( Objects.isNull(year)|| year <= 0 || year < Calendar.getInstance().get(Calendar.YEAR) ){
-            return EntityStatus.INVALID_ENTRY;
+        this.timeFields = timeFields.clone(); 
+
+        //check null values
+        for(var dateTimeField :  this.timeFields){
+            if (Objects.isNull(dateTimeField)) {
+               EntityStatus.EMPTY_ENTRY.throwException("A date field is empty"); 
+            }
         }
 
 
-        timetoFinish.set(Calendar.YEAR, year);
+            //check valid values for leap years
+        if(  !Year.isLeap(this.timeFields[IndexValue.YEAR.value()] ) ){
 
-        return EntityStatus.SUCCESS;
-    }
+            if( this.timeFields[IndexValue.MONTH.value()] == Month.FEBRUARY.getValue()
+                || this.timeFields[IndexValue.DAY.value()] == leapDay){
+                EntityStatus.INVALID_ENTRY.throwException("The current year is not leap.");
 
-    public EntityStatus setMonth(final Integer month){
+            }
 
-    
-        if( Objects.isNull(month)|| month <= 0 || month - 1 < Calendar.getInstance().get(Calendar.MONTH) || month > 12){
-            return EntityStatus.INVALID_ENTRY;
         }
 
+        //check negative numbers 
+        for (var dateTimeField : this.timeFields) {
 
-        timetoFinish.set(Calendar.MONTH, month - 1);
-
-        return EntityStatus.SUCCESS;
-
-    }
-
-    public EntityStatus setDay(final Integer day){
-
-    
-        if( Objects.isNull(day)||  day <= 0|| day < Calendar.getInstance().get(Calendar.DAY_OF_MONTH) || day > 31){
-            return EntityStatus.INVALID_ENTRY;
+            if(dateTimeField <= 0){ EntityStatus.INVALID_ENTRY.throwException("Invalid value. Put numbers bigger than 0"); }
         }
 
+        //check if in past
+        LocalDateTime dueDate = LocalDateTime.of(
+            timeFields[IndexValue.YEAR.value()],
+            timeFields[IndexValue.MONTH.value()],
+            timeFields[IndexValue.DAY.value()],
+            timeFields[IndexValue.HOUR.value()],
+            timeFields[IndexValue.MINUTE.value()]
+        );
 
-        timetoFinish.set(Calendar.DAY_OF_MONTH, day);
-
-        return EntityStatus.SUCCESS;
-
-    }
-
-    public EntityStatus setHour(final Integer hour){
-
-        if( Objects.isNull(hour)|| hour <= 0|| hour < Calendar.getInstance().get(Calendar.HOUR_OF_DAY) || hour > 23){
-            return EntityStatus.INVALID_ENTRY;
+        if (dueDate.isBefore(currentDate)) {
+            EntityStatus.INVALID_ENTRY.throwException(
+                "The date cannot be in the past."
+            );
         }
 
+    }
 
-        timetoFinish.set(Calendar.HOUR_OF_DAY, hour);
+    public  LocalDateTime getDate(){
 
-        return EntityStatus.SUCCESS;
+       return LocalDateTime.of(
+            timeFields[IndexValue.YEAR.value()],
+            timeFields[IndexValue.MONTH.value()],
+            timeFields[IndexValue.DAY.value()],
+            timeFields[IndexValue.HOUR.value()],
+            timeFields[IndexValue.MINUTE.value()]
+        );
 
     }
 
-    public EntityStatus setMinute(final Integer minute){
-
-        if( Objects.isNull(minute)|| minute <= 0|| minute < Calendar.getInstance().get(Calendar.MINUTE) || minute > 59){
-            return EntityStatus.INVALID_ENTRY;
-        }
 
 
-        timetoFinish.set(Calendar.MINUTE, minute);
+    private enum IndexValue{
 
-        return EntityStatus.SUCCESS;
+    // Each value represents a index position
+    // thar TaskDate user to read Date fields
+    // fro an Integer[]
+
+      YEAR{
+
+         @Override
+          public int value() {
+              return 0;
+          } 
+
+      },
+      MONTH{
+
+         @Override
+          public int value() {
+              return 1;
+          } 
+
+      },
+      DAY{
+
+         @Override
+          public int value() {
+              return 2;
+          } 
+
+      },
+      HOUR{
+
+         @Override
+          public int value() {
+              return 3;
+          } 
+
+      },
+      MINUTE{
+
+         @Override
+          public int value() {
+              return 4;
+          } 
+
+      };
+
+
+      abstract public int value();
 
     }
-
-    public String getDate(){
-
-        return 
-            "year   : " + (timetoFinish.get(Calendar.YEAR) + 1) + "\n"    + 
-            "month  : " + (timetoFinish.get(Calendar.MONTH) + 1) + "\n"   +
-            "day    : " + timetoFinish.get(Calendar.DAY_OF_MONTH) + "\n"  +
-            "hour   : " + timetoFinish.get(Calendar.HOUR_OF_DAY) + "\n"   +
-            "minute : " + timetoFinish.get(Calendar.MINUTE)    + "\n"     ;
-
-
-    }
-
 }

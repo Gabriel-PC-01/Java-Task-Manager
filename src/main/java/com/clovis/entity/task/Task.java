@@ -1,9 +1,6 @@
 package com.clovis.entity.task;
 
 
-import java.util.Objects;
-
-import com.clovis.entity.EntityStatus;
 
 
 /**
@@ -11,49 +8,37 @@ import com.clovis.entity.EntityStatus;
  */
 public final class Task {
 
-    private TaskDate date = new TaskDate(); 
-    private Description description = new Description();
-    private Title title = new Title();
+    private final TaskDate dateToComplete; 
+    private final TaskDescription taskDescription;
+    private final TaskTitle taskTitle;
+    private boolean isComplete = false;
 
 
-    public EntityStatus setTitle(Title title) {
+    public Task(TaskTitle taskTitle, TaskDate dateToComplete, TaskDescription taskDescription){
 
-        if(Objects.isNull(title)){
-            return EntityStatus.EMPTY_ENTRY;
-        }
-
-        this.title = title;
-        return EntityStatus.SUCCESS;
+        this.taskTitle = taskTitle;
+        this.dateToComplete = dateToComplete;
+        this.taskDescription = taskDescription;
     }
 
-    public EntityStatus setDate(TaskDate date) {
 
-        if(Objects.isNull(date)){
-            return EntityStatus.EMPTY_ENTRY;
-        }
+    public void completeTask(){
+        isComplete = true;
+    } 
 
-        this.date = date;
-        return EntityStatus.SUCCESS;
-
+    public boolean isComplete() {
+        return isComplete;
     }
 
-    public EntityStatus setDescription(Description desciption) {
 
-        if(Objects.isNull(description)){
-            return EntityStatus.EMPTY_ENTRY;
-        }
-
-        this.description = desciption;
-
-        return EntityStatus.SUCCESS;
-    }
 
     
     public String getTask(){
 
-        return date.getDate() + "\n\n"                  +
-               title.getTitle() + "\n\n"                +
-               description.getaDescription() + "\n\n"   ; 
+        return "Title : " + taskTitle.getTitle() +
+                "Date to complete : " + dateToComplete.getDate() +
+                "task description : " + taskDescription.getDescription() +
+                "Is complete ? : " + isComplete; 
 
     }
 

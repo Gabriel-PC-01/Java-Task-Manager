@@ -5,8 +5,21 @@ package com.clovis.entity;
  */
 public enum EntityStatus {
 
-    SUCCESS,
-    EMPTY_ENTRY,
-    INVALID_ENTRY
+    EMPTY_ENTRY{
+        @Override
+        public void throwException(String message) throws Exception{
+           
+            throw new IllegalArgumentException(message);
 
+        }
+    },
+    INVALID_ENTRY{
+        @Override
+        public void throwException(String message) throws Exception{
+           throw new IllegalArgumentException(message); 
+        }
+    };
+
+
+    public abstract void throwException(String message) throws Exception;
 }
