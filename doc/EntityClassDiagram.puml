@@ -1,58 +1,114 @@
-@startuml
+@startuml EntityClassDiagram
 
+package "com.clovis.entity" {
+    enum EntityStatus {
+        EMPTY_ENTRY
+        INVALID_ENTRY
+        __
+        + {abstract} throwException(message: String): void
+    }
+}
 
-    class Task{
+package "com.clovis.entity.task" {
 
-        Title title
-        TaskDate date
-        Description description
-
-        setTitle(Title) : EntityStatus
-        setDescription(Description) : EntityStatus
-        setDate(Date) : EntityStatus
-
-        getTitle() : String
-
+    class Task <<final>> {
+        - dateToComplete: TaskDate
+        - taskDescription: TaskDescription
+        - taskTitle: TaskTitle
+        - isComplete: boolean
+        __
+        + Task(taskTitle: TaskTitle, dateToComplete: TaskDate, taskDescription: TaskDescription)
+        + completeTask(): void
+        + isComplete(): boolean
+        + getTask(): String
     }
 
-    class Title{
-
-        String title;
-
-        setTitle(String) : EntityStatus
-
-        getTitle() : String
-
+    class TaskTitle <<final>> {
+        - title: String
+        - {static} maxSize: Integer = 50
+        __
+        + TaskTitle(title: String)
+        + getTitle(): String
+        + {static} getMaxSize(): int
     }
 
-    class TaskDate{
-
-        Calendar date
-
-        setYear(Integer) : EntityStatus
-        setMonth(Integer) : EntityStatus
-        setDay(Integer) : EntityStatus
-        setHour(Integer) : EntityStatus
-        setMinute(Integer) : EntityStatus
-
-        getDate() : String
-        
+    class TaskDescription <<final>> {
+        - description: String
+        - {static} maxSize: Integer = 200
+        __
+        ~ TaskDescription(description: String)
+        + getDescription(): String
+        + {static} getMaxSize(): int
     }
 
-    class Description{
-
-        String description;
-
-        setDescription(String) : EntityStatus
-
-        getDescription() : String
-
+    class TaskDate <<final>> {
+        - timeFields: Integer[]
+        - leapDay: Integer = 29
+        - currentDate: LocalDateTime
+        __
+        + TaskDate(timeFields: Integer[])
+        + getDate(): LocalDateTime
     }
- 
-    Task *-- Title : has >
-    Task *-- TaskDate : has >
-    Task *-- Description : has >
 
-    note top of Task : It needs Title, TaskDate and Description to be instace
+    enum IndexValue <<private>> {
+        YEAR
+        MONTH
+        DAY
+        HOUR
+        MINUTE
+        __
+        + {abstract} value(): int
+    }
+
+    class BuildTaskTitle {
+        - title: String
+        __
+        + setTitle(title: String): BuildTaskTitle
+        + build(): TaskTitle
+    }
+
+    class BuildTaskDescription {
+        ~ description: String
+        __
+        + setDescription(description: String): BuildTaskDescription
+        + build(): TaskDescription
+    }
+
+    class BuildTaskDate {
+        - year: int
+        - month: int
+        - day: int
+        - hour: int
+        - minute: int
+        __
+        + setYear(year: int): BuildTaskDate
+        + setMonth(month: int): BuildTaskDate
+        + setDay(day: int): BuildTaskDate
+        + setHour(hour: int): BuildTaskDate
+        + setMinute(minute: int): BuildTaskDate
+        + build(): TaskDate
+    }
+
+}
+
+' Relacionamentos de Composição
+Task *-- TaskTitle : taskTitle
+Task *-- TaskDate : dateToComplete
+Task *-- TaskDescription : taskDescription
+
+' Relacionamentos de Construção (Builders)
+BuildTaskTitle ..> TaskTitle : creates >
+BuildTaskDescription ..> TaskDescription : creates >
+BuildTaskDate ..> TaskDate : creates >
+
+' Enum aninhado
+TaskDate +-- IndexValue
+
+' Dependências com EntityStatus
+TaskTitle ..> EntityStatus : uses >
+TaskDescription ..> EntityStatus : uses >
+TaskDate ..> EntityStatus : uses >
+
+note top of Task : Task requer TaskTitle, TaskDate e TaskDescription para ser instanciada
 
 @enduml
